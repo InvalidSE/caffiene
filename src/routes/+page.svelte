@@ -1,72 +1,170 @@
 <svelte:head>
-
+    <title>Caffiene</title>
+    <meta name="description" content="The best priced v refresh in Auckland CBD" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/favicon.png" type="image/png">
 </svelte:head>
+
+<script lang="ts">
+    import { onMount } from 'svelte';
+    
+    let url = "/api"
+	interface PriceDetails {
+		[key: string]: {
+			unit: string;
+			quantity: number;
+			price: number;
+			price_per_unit: number;
+			store_full_name: string;
+			is_available: boolean;
+		};
+	}
+
+    interface Product {
+        id: number;
+        name: string;
+        quantity: number;
+        unit: string;
+        price_details: PriceDetails;
+    }
+
+	interface ApiResponse {
+		success: boolean;
+		status: number;
+		data: Product[];
+	}
+
+	let data: ApiResponse | null = null;
+
+    let bestPrice: Number | null = null;
+    let bestPriceSize = "Loading...";
+    let bestPriceStore = "Loading...";
+
+    // Fetch data from the API
+    onMount(async () => {
+        const response = await fetch(url);
+        if (response.ok) {
+            data = await response.json();
+        } else {
+            console.error('Failed to fetch data:', response.statusText);
+            let bestPrice = Infinity;
+            let bestPriceSize = "27 L";
+            let bestPriceStore = "Nowhere";
+        }
+
+        let smallCan: Product | undefined = data?.data.find((item: Product) => item.id === 706549054);
+        let largeCan: Product | undefined = data?.data.find((item: Product) => item.id === 744712754);
+
+        if (smallCan && largeCan) {
+            const smallCanPrices = Object.values(smallCan.price_details).filter(detail => detail.is_available);
+            const largeCanPrices = Object.values(largeCan.price_details).filter(detail => detail.is_available);
+
+            const bestSmallCan = smallCanPrices.reduce((prev, curr) => (curr.price < prev.price ? curr : prev), { price: Infinity, store_full_name: "nowhere"});
+            const bestLargeCan = largeCanPrices.reduce((prev, curr) => (curr.price < prev.price ? curr : prev), { price: Infinity, store_full_name: "nowhere"});
+
+            if (bestSmallCan.price < bestLargeCan.price) {
+                bestPrice = bestSmallCan.price;
+                bestPriceSize = "250ml";
+                bestPriceStore = bestSmallCan.store_full_name;
+            } else {
+                bestPrice = bestLargeCan.price;
+                bestPriceSize = "500ml";
+                bestPriceStore = bestLargeCan.store_full_name;
+            }
+
+            if (bestPriceStore === "New_World_metro_auckland") {
+                bestPriceStore = "New World";
+            } else if (bestPriceStore === "Countdown_auckland_city") {
+                bestPriceStore = "Countdown";
+            } else if (bestPriceStore === "The_Warehouse") {
+                bestPriceStore = "The Warehouse";
+            } else {
+                bestPriceStore = "Nowhere";
+            }
+        } else {
+            bestPrice = Infinity;
+            bestPriceStore = "Nowhere";
+            bestPriceSize = "4 GB"
+        }
+
+    });
+
+
+
+</script>
 
 <div class="container mx-auto lg:py-40">
     <section class="title">
         <div class="my-10 flex flex-col">
             <span class="text-5xl md:text-7xl lg:text-8xl font-bold bg-gradient-to-r from-primary via-accent to-primary text-transparent bg-clip-text animate-gradient bg-300%">
-                Taine Reader
+                Caffiene
             </span>
             <span class="font-bold text-xl md:text-2xl lg:text-3xl">
-                Engineering student at the University of Auckland
+                The best priced V Refresh in Auckland CBD
+            </span>
+            <span class="font-bold text-l md:text-xl lg:text-xl text-gray-500">
+                (Blackcurrant Yuzu, of course)
             </span>
         </div>
-        <div class="flex flex-col md:flex-row lg:flex-row gap-2">
-            <a href="/projects" class="btn btn-outline text-xl">Projects</a>
-            <a href="#contact" class="btn btn-outline text-xl">Contact</a>
-            <a href="#about" class="btn btn-outline text-xl">About</a>
-            <a href="#technology" class="btn btn-outline text-xl">Technology</a>
+    </section>
+    <div class="spacer my-20" />
+
+    <section class="content flex flex-row gap-40">
+        <!-- Stats -->
+        <div class="stats stats-vertical lg:stats-horizontal shadow">
+            <div class="stat">
+                <div class="stat-title">The Incredible</div>
+				<div class="stat-value bg-gradient-to-r from-primary via-accent to-primary text-transparent bg-clip-text animate-gradient bg-300%">Best Price</div>
+                <div class="stat-desc">(hopefully it's good...)</div>
+            </div>
+            <div class="stat">
+                <div class="stat-title">Best Size</div>
+				<div class="stat-value bg-gradient-to-r from-primary via-accent to-primary text-transparent bg-clip-text animate-gradient bg-300%">{bestPriceSize}</div>
+                <div class="stat-desc">Incredible!</div>
+            </div>
+
+            <div class="stat">
+                <div class="stat-title">Best Price</div>
+                <div class="stat-value bg-gradient-to-r from-primary via-accent to-primary text-transparent bg-clip-text animate-gradient bg-300%">{bestPrice ? "$" + bestPrice : "Loading..."}</div>
+                <div class="stat-desc">Lowest price for energy drinks</div>
+            </div>
+
+            <div class="stat">
+                <div class="stat-title">Best Store</div>
+                <div class="stat-value bg-gradient-to-r from-primary via-accent to-primary text-transparent bg-clip-text animate-gradient bg-300%">{bestPriceStore}</div>
+                <div class="stat-desc">Store with the best price</div>
+            </div>
         </div>
     </section>
-    <div class="spacer my-40" />
-    <section class="content flex flex-col gap-40">
-        <section class="contact">
-            <span class="text-5xl font-bold">Contact</span>
-            <div class="spacer my-4" />
-            <div class="flex flex-col md:flex-row lg:flex-row gap-2">
-                <a href="mailto:me@invalidse.com" class="btn btn-outline text-xl">
-                    Email
-                </a>
-                <a href="https://github.com/invalidse" target="_blank" class="btn btn-outline text-xl">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-github"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
-                    GitHub    
-                </a>
-                <a href="https://www.linkedin.com/in/taine-reader/" target="_blank" class="btn btn-outline text-xl">
-                    LinkedIn
-                </a>
-                <a href="https://discord.com/" target="_blank" class="btn btn-outline text-xl">
-                    Discord
-                </a>
-            </div>
-        </section>
-        <section>
-            <span class="text-5xl font-bold">About</span>
-        </section>
-        <section>
-            <span class="text-5xl font-bold">Technology</span>
-        </section>
-    </section>
 
-    <label class="swap swap-rotate">
-        <input type="checkbox" class="theme-controller" value="nord" />
+    <div class="spacer my-20" />
 
-        <svg
-          class="swap-off h-10 w-10 fill-current"
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24">
-          <path
-            d="M21.64,13a1,1,0,0,0-1.05-.14,8.05,8.05,0,0,1-3.37.73A8.15,8.15,0,0,1,9.08,5.49a8.59,8.59,0,0,1,.25-2A1,1,0,0,0,8,2.36,10.14,10.14,0,1,0,22,14.05,1,1,0,0,0,21.64,13Zm-9.5,6.69A8.14,8.14,0,0,1,7.08,5.22v.27A10.15,10.15,0,0,0,17.22,15.63a9.79,9.79,0,0,0,2.1-.22A8.11,8.11,0,0,1,12.14,19.73Z" />
-        </svg>
+    <!-- Store List -->
+    <div class="store-prices">
+        {#if data}
+            {#each data.data.filter(product => product.id === 706549054 || product.id === 744712754) as product}
+                <div class="product">
+                    
+                    <div class="spacer my-10" />
+                    <div class="price-details stats shadow">
+                        <div class="stat">
+                            <div class="stat-title">Size</div>
+                            <div class="stat-value">
+                                {product.quantity}{product.unit.toUpperCase()}
+                            </div> 
+                        </div>
+                        {#each Object.entries(product.price_details).filter(([_, details]) => details.is_available) as [store, details]}
+                            <div class="stat">
+                                <div class="stat-title">{store.replace(/_/g, ' ').replace(/\b\w/g, char => char.toUpperCase())}</div>
+                                <div class="stat-value">${details.price}</div>
+                            </div>
+                        {/each}
+                    </div>
+                </div>
+            {/each}
+        {:else}
+            <!-- <p>Loading store prices...</p> -->
+        {/if}
+    </div>
 
-        <svg
-          class="swap-on h-10 w-10 fill-current"
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24">
-          <path
-            d="M5.64,17l-.71.71a1,1,0,0,0,0,1.41,1,1,0,0,0,1.41,0l.71-.71A1,1,0,0,0,5.64,17ZM5,12a1,1,0,0,0-1-1H3a1,1,0,0,0,0,2H4A1,1,0,0,0,5,12Zm7-7a1,1,0,0,0,1-1V3a1,1,0,0,0-2,0V4A1,1,0,0,0,12,5ZM5.64,7.05a1,1,0,0,0,.7.29,1,1,0,0,0,.71-.29,1,1,0,0,0,0-1.41l-.71-.71A1,1,0,0,0,4.93,6.34Zm12,.29a1,1,0,0,0,.7-.29l.71-.71a1,1,0,1,0-1.41-1.41L17,5.64a1,1,0,0,0,0,1.41A1,1,0,0,0,17.66,7.34ZM21,11H20a1,1,0,0,0,0,2h1a1,1,0,0,0,0-2Zm-9,8a1,1,0,0,0-1,1v1a1,1,0,0,0,2,0V20A1,1,0,0,0,12,19ZM18.36,17A1,1,0,0,0,17,18.36l.71.71a1,1,0,0,0,1.41,0,1,1,0,0,0,0-1.41ZM12,6.5A5.5,5.5,0,1,0,17.5,12,5.51,5.51,0,0,0,12,6.5Zm0,9A3.5,3.5,0,1,1,15.5,12,3.5,3.5,0,0,1,12,15.5Z" />
-        </svg>
-    
-    </label>
 </div>
-
