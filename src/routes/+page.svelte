@@ -146,7 +146,7 @@
                 <div class="product">
                     
                     <div class="spacer my-10" />
-                    <div class="price-details stats shadow">
+                    <div class="price-details stats stats-vertical lg:stats-horizontal shadow">
                         <div class="stat">
                             <div class="stat-title">Size</div>
                             <div class="stat-value">
