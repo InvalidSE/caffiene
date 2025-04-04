@@ -33,6 +33,7 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"@sveltejs/adapter-cloudflare": "^7.0.0",
 		"autoprefixer": "^10.4.19",
 		"rehype-stringify": "^10.0.1",
 		"remark-parse": "^11.0.0",
