@@ -2,7 +2,7 @@
     <title>Caffiene</title>
     <meta name="description" content="The best priced v refresh in Auckland CBD" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="/favicon.png" type="image/png">
+    <link rel="icon" href="/favicon.png?v=1" type="image/png">
 </svelte:head>
 
 <script lang="ts">
