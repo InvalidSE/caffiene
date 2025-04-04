@@ -36,9 +36,12 @@
 
 	let data: ApiResponse | null = null;
 
-    let bestPrice: Number | null = null;
+    let bestPrice: number | null = null;
     let bestPriceSize = "Loading...";
     let bestPriceStore = "Loading...";
+
+    let bestSmallCanPrice: number = 0;
+    let bestLargeCanPrice: number = 0;
 
     // Fetch data from the API
     onMount(async () => {
@@ -62,7 +65,10 @@
             const bestSmallCan = smallCanPrices.reduce((prev, curr) => (curr.price < prev.price ? curr : prev), { price: Infinity, store_full_name: "nowhere"});
             const bestLargeCan = largeCanPrices.reduce((prev, curr) => (curr.price < prev.price ? curr : prev), { price: Infinity, store_full_name: "nowhere"});
 
-            if (bestSmallCan.price < bestLargeCan.price) {
+            bestSmallCanPrice = bestSmallCan.price;
+            bestLargeCanPrice = bestLargeCan.price;
+
+            if (bestSmallCan.price / 0.25 < bestLargeCan.price / 0.5) {
                 bestPrice = bestSmallCan.price;
                 bestPriceSize = "250ml";
                 bestPriceStore = bestSmallCan.store_full_name;
@@ -156,7 +162,11 @@
                         {#each Object.entries(product.price_details).filter(([_, details]) => details.is_available) as [store, details]}
                             <div class="stat">
                                 <div class="stat-title">{store.replace(/_/g, ' ').replace(/\b\w/g, char => char.toUpperCase())}</div>
-                                <div class="stat-value">${details.price}</div>
+                                {#if details.price <= ((details.quantity == 0.25) ? bestSmallCanPrice : bestLargeCanPrice)}
+                                    <div class="stat-value bg-gradient-to-r from-primary via-accent to-primary text-transparent bg-clip-text animate-gradient bg-300%">${details.price}</div>
+                                {:else}
+                                    <div class="stat-value">${details.price}</div>
+                                {/if}
                             </div>
                         {/each}
                     </div>
