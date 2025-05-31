@@ -1,6 +1,6 @@
 <svelte:head>
     <title>Caffiene</title>
-    <meta name="description" content="The best priced v refresh in Auckland CBD" />
+    <meta name="description" content="The best priced red bull in Auckland CBD" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="/favicon.png?v=1" type="image/png">
 </svelte:head>
@@ -8,7 +8,7 @@
 <script lang="ts">
     import { onMount } from 'svelte';
     
-    let url = "/api"
+    let url = "/api/redbull"
 	interface PriceDetails {
 		[key: string]: {
 			unit: string;
@@ -55,8 +55,8 @@
             let bestPriceStore = "Nowhere";
         }
 
-        let smallCan: Product | undefined = data?.data.find((item: Product) => item.id === 706549054);
-        let largeCan: Product | undefined = data?.data.find((item: Product) => item.id === 744712754);
+        let smallCan: Product | undefined = data?.data.find((item: Product) => item.id === 55710190); 
+        let largeCan: Product | undefined = data?.data.find((item: Product) => item.id === 55710173);
 
         if (smallCan && largeCan) {
             const smallCanPrices = Object.values(smallCan.price_details).filter(detail => detail.is_available);
@@ -68,13 +68,13 @@
             bestSmallCanPrice = bestSmallCan.price;
             bestLargeCanPrice = bestLargeCan.price;
 
-            if (bestSmallCan.price / 0.25 < bestLargeCan.price / 0.5) {
+            if (bestSmallCan.price / 0.25 < bestLargeCan.price / 0.355) {
                 bestPrice = bestSmallCan.price;
                 bestPriceSize = "250ml";
                 bestPriceStore = bestSmallCan.store_full_name;
             } else {
                 bestPrice = bestLargeCan.price;
-                bestPriceSize = "500ml";
+                bestPriceSize = "355ml";
                 bestPriceStore = bestLargeCan.store_full_name;
             }
 
@@ -106,10 +106,10 @@
                 Caffiene
             </span>
             <span class="font-bold text-xl md:text-2xl lg:text-3xl">
-                The best priced V Refresh in Auckland CBD
+                The best priced RED BULL in Auckland CBD
             </span>
             <span class="font-bold text-l md:text-xl lg:text-xl text-gray-500">
-                (Blackcurrant Yuzu, of course)
+                (By request - 335ml is the normal one, 250ml is sugar free)
             </span>
         </div>
     </section>
@@ -144,7 +144,7 @@
     <!-- Store List -->
     <div class="store-prices">
         {#if data}
-            {#each data.data.filter(product => product.id === 706549054 || product.id === 744712754) as product}
+            {#each data.data.filter(product => product.id === 55710190 || product.id === 55710173) as product}
                 <div class="product">
                     
                     <div class="spacer my-10" />
